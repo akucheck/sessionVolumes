@@ -19,7 +19,7 @@ the total Globex volume, and the RTH volume
 123456,1234567
  
 *)
-module totalVolumePriceChange =
+module sessionVolumes =
     open System
     // open System.IO
     open TickLib
