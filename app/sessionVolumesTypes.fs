@@ -8,8 +8,7 @@ type InputRow =
       DeltaFactor : int
       Occur : int
       AggVol : int
-      AggDelta : int
-      LastFlag : string }
+      AggDelta : int}
 
 let deserializeInputRow (line : string) =
     let lineArray = line.Split(',')
@@ -22,8 +21,7 @@ let deserializeInputRow (line : string) =
           DeltaFactor = int lineArray.[4]
           Occur = int lineArray.[5]
           AggVol = int lineArray.[6]
-          AggDelta = int lineArray.[7]
-          LastFlag = lineArray.[8] }
+          AggDelta = int lineArray.[7] }
     currInputRow
 
 
