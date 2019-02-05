@@ -1,6 +1,6 @@
-﻿// sessVols.fs
+﻿// sessionVolumes.fs
 (*
-usage: cat inFile | sessVolComp  > outFile.txt
+usage: cat inFile | sessionVolumes  > outFile.txt
 
 Expected input: the standard "shrink" format that contains one row for each
 price change during the course of a session.  
@@ -13,9 +13,9 @@ dateTime, seqNum, volume, deltaFactor, occur, aggVol, aggDelta
 2018-12-27T15:00:00,47,2491.50,1,1,2,3,0
 
 Expected output: 
-the total Globex volume, and the RTH volume
-// gbxVolume, rthVolume
-123456,1234567
+tradeDate, total Globex volume, and total RTH volume
+// tradeDate, gbxVolume, rthVolume
+2018-12-27,123456,1234567
  
 *)
 module sessionVolumes =
@@ -36,12 +36,16 @@ module sessionVolumes =
     let classifyVolumeBySession (line : string) =
         let currRow = deserializeInputRow line
         let sessionIdentifier = getSessionIdent (currRow)
+        let tradeDate = DateTime.Parse(currRow.DateTime).ToString("yyyy-MM-dd")
         match (sessionIdentifier) with
-        | "RTH" -> (0, currRow.AggVol)
-        | _ -> (currRow.AggVol, 0)
+        | "RTH" -> (tradeDate, 0, currRow.AggVol)
+        | _ -> (tradeDate, currRow.AggVol, 0)
     
-    let accumulateSessionVolumes (state : int * int) (rowVols : int * int) =
-        (fst state + fst rowVols, snd state + snd rowVols)
+    let accumulateSessionVolumes (state : string * int * int) 
+        (rowValues : string * int * int) =
+        let (_tradeDate, gbxVolState, rthVolState) = state
+        let (tradeDate, gbxVolRow, rthVolRow) = rowValues
+        (tradeDate, gbxVolState + gbxVolRow, rthVolState + rthVolRow)
     
     [<EntryPoint>]
     let main _argv =
@@ -49,8 +53,8 @@ module sessionVolumes =
             Seq.initInfinite readInput
             |> Seq.takeWhile ((<>) null)
             |> Seq.map classifyVolumeBySession
-            |> Seq.fold accumulateSessionVolumes (0, 0)            
-            ||> printfn "%d,%d" // note the tupleForwardPipe operator
+            |> Seq.fold accumulateSessionVolumes ("", 0, 0)
+            |||> printfn "%s,%d,%d" // note the tupleForwardPipe operator
         0 // return an integer exit code 
 // ========================================================
 // ** end main ** 

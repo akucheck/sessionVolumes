@@ -37,3 +37,23 @@ let rth = getSession gbxOpenTime lastSecBeforeMidnight midnight rthOpenTime anRt
 //
 let intTuple = (5, 10)   
 printfn "%d %d" <|| intTuple
+
+let anotherDateTimeString = "2018-12-27T15:00:00"
+let aTradeDate = DateTime.Parse(anotherDateTimeString).ToString("yyyy-MM-dd")
+
+// holiday array handling
+let holidays = [|
+        "2009-01-01";
+        "2009-01-19";
+        "2009-02-16"
+                    |]
+
+let holidays2D = [|
+        ("2009-01-01", "New Year");
+        ("2009-01-19", "MLK Day");
+        ("2009-02-16", "Presidents Day")
+                    |]
+// let res = Array.Exists (fun elem ->  elem = "2009-01-01") holidays 
+
+let isHoliday (dateUnderTest: string) = Array.exists (fun elem -> elem = dateUnderTest) 
+let res = isHoliday "2009-01-01" holidays2D
